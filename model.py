@@ -14,7 +14,7 @@ class CaptchaModel(nn.Module):
         self.relu3 = nn.ReLU()
 
         self.l1 = nn.Linear(1152, 64)
-        self.do1 = nn.Dropout()
+        self.do1 = nn.Dropout(0.2)
         self.lstm1 = nn.LSTM(64, 32)
         self.l2 = nn.Linear(32, 20)
 
@@ -25,12 +25,7 @@ class CaptchaModel(nn.Module):
         x = self.mp2(x)
         x = x.permute(0, 3, 1, 2)
         x = x.view(x.shape[0], x.shape[1], -1)
-        x = self.relu3(self.l1(x))
+        x = self.do1(self.relu3(self.l1(x)))
         x, _ = self.lstm1(x)
         x = self.l2(x)
-        print(x.shape)
-
-
-model = CaptchaModel()
-x = torch.rand(1, 3, 75, 300)
-model(x)
+        return x
