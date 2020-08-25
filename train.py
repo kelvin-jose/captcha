@@ -27,10 +27,10 @@ test_dataset = torch.utils.data.DataLoader(CaptchaDataset(x_test, y_test),
                                            num_workers=4)
 model = CaptchaModel().to(device)
 loss_fn = torch.nn.CTCLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.8, patience=5)
 
 for epoch in range(config.epochs):
     train_loss = train_fn(model, train_dataset, optimizer, scheduler, device, loss_fn)
-    val_loss = valid_fn(model, test_dataset, device, loss_fn, label_encoder)
+    val_loss = valid_fn(model, test_dataset, device, loss_fn, scheduler, label_encoder)
     print(f'epoch: {epoch} train loss: {train_loss} valid loss: {val_loss}')

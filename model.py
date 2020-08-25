@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 
@@ -15,8 +14,9 @@ class CaptchaModel(nn.Module):
 
         self.l1 = nn.Linear(1152, 64)
         self.do1 = nn.Dropout(0.2)
-        self.lstm1 = nn.LSTM(64, 32)
-        self.l2 = nn.Linear(32, 20)
+        self.lstm1 = nn.LSTM(64, 32, num_layers=3, batch_first=True, dropout=0.2, bidirectional=True)
+        self.gru1 = nn.GRU(64, 32, num_layers=3, batch_first=True, dropout=0.2, bidirectional=True)
+        self.l2 = nn.Linear(64, 20)
 
     def forward(self, input):
         x = self.relu1(self.conv1(input))
@@ -26,6 +26,6 @@ class CaptchaModel(nn.Module):
         x = x.permute(0, 3, 1, 2)
         x = x.view(x.shape[0], x.shape[1], -1)
         x = self.do1(self.relu3(self.l1(x)))
-        x, _ = self.lstm1(x)
+        x, _ = self.gru1(x)
         x = self.l2(x)
         return x
